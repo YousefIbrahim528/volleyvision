@@ -79,25 +79,7 @@ transform = transforms.Compose([
 ])
 
 
-activity_to_id=saving_imagepath_to_txt()
 
 
-img_paths, labels = read_dataset_txt()
-length = len(img_paths)
-split_index = int(0.7 * length)
-
-
-train_paths = img_paths[:split_index]
-train_labels = labels[:split_index]
-
-test_paths = img_paths[split_index:]
-test_labels = labels[split_index:]
-
-
-train_dataset = ImageLevelDataset(train_paths, train_labels,activity_to_id,transform)
-test_dataset = ImageLevelDataset(test_paths,test_labels,activity_to_id, transform)
-
-
-
-train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
-test_loader = DataLoader(test_dataset, batch_size=32)
+# train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+# test_loader = DataLoader(test_dataset, batch_size=32)

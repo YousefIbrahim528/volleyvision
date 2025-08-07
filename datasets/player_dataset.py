@@ -10,7 +10,7 @@ from PIL import Image
 class PlayerActionDataset(Dataset):
     def __init__(self, base_path, transform=None):
         self.transform = transform
-        self.samples = []  # list of tuples: (image_path, (x1, y1, x2, y2), label)
+        self.samples = []  
 
         for match in os.listdir(base_path):
             match_path = os.path.join(base_path, match)
@@ -31,7 +31,7 @@ class PlayerActionDataset(Dataset):
                     self.samples.append((image_path, box_coords, label))
 
         
-        label_set = sorted(list(set(label for _, _, label in self.samples)))
+        label_set = list(set(label for _, _, label in self.samples))
         self.label_to_id = {label: idx for idx, label in enumerate(label_set)}
 
     def __len__(self):

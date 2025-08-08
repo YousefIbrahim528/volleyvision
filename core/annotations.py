@@ -69,5 +69,3 @@ def save_label_mappings(activity_to_id, save_path="group_activity_labels.json"):
 
 
 
-
-#https://github.com/YousefIbrahim528/volleyvision.git

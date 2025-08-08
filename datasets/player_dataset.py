@@ -1,6 +1,6 @@
 import os
 from torch.utils.data import Dataset
-from annotations import read_file
+from ..core import annotations
 
 from torchvision import transforms
 from PIL import Image
@@ -18,7 +18,7 @@ class PlayerActionDataset(Dataset):
             if not os.path.exists(annotation_file):
                 continue
 
-            video_info, _, _ = read_file(annotation_file)
+            video_info, _, _ = annotations.read_file(annotation_file)
 
             for frame_id, dic in video_info.items():
                 frame_id_str = str(frame_id)
@@ -30,7 +30,6 @@ class PlayerActionDataset(Dataset):
                     label = box.activity
                     self.samples.append((image_path, box_coords, label))
 
-        
         label_set = list(set(label for _, _, label in self.samples))
         self.label_to_id = {label: idx for idx, label in enumerate(label_set)}
 
@@ -45,6 +44,8 @@ class PlayerActionDataset(Dataset):
 
         if self.transform:
             player_crop = self.transform(player_crop)
+
+
 
         label_id = self.label_to_id[label]
         return player_crop, label_id

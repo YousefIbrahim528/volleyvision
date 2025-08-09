@@ -10,9 +10,10 @@ import os
 
 from datasets.init import datasetinit
 
-model = torchvision.models.alexnet(pretrained=True)
+
 
 def train_test_model(num_classes,traindataloader,testdataloader):
+    model = torchvision.models.alexnet(pretrained=True)
     model.classifier[6] = nn.Linear(4096, num_classes )
 
 

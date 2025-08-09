@@ -1,4 +1,4 @@
-from base_model_1 import train_test_model
+from  base_model_1 import *
 from datasets.init import datasetinit
 from torch.utils.data import DataLoader, Dataset
 

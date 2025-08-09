@@ -5,7 +5,7 @@ from torchvision import transforms
 from PIL import Image
 from torch.utils.data import Dataset
 import os
-from annotations import read_file
+from ..core import annotations
 
 from torch.utils.data import DataLoader
 
@@ -19,7 +19,7 @@ def saving_imagepath_to_txt(save_path="data/splits/dataset.txt"):
             if not os.path.exists(annotation_file):
                 continue
 
-            video_info, _, _ = read_file(annotation_file)
+            video_info, _, _ = annotations.read_file(annotation_file)
 
             for frame_id, dic in video_info.items():
                 frame_filename = f"{frame_id}.jpg"

@@ -15,7 +15,7 @@ test_player_dataset = Data.test_player_dataset
 
 traindataloader = DataLoader(train_player_dataset, batch_size=32, shuffle=True)
 testdataloader = DataLoader(test_player_dataset, batch_size=32, shuffle=True)
-
-train_test_model(num_classes=9, traindataloader=traindataloader, testdataloader=testdataloader)
+base = "2"
+train_test_model(num_classes=9, traindataloader=traindataloader, testdataloader=testdataloader,base=base)
 
 

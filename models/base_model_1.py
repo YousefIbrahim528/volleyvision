@@ -12,11 +12,9 @@ from datasets.init import datasetinit
 
 
 
-def train_test_model(num_classes,traindataloader,testdataloader):
+def train_test_model(num_classes,traindataloader,testdataloader,base):
     model = torchvision.models.alexnet(pretrained=True)
     model.classifier[6] = nn.Linear(4096, num_classes )
-
-
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = model.to(device)
 
@@ -55,19 +53,20 @@ def train_test_model(num_classes,traindataloader,testdataloader):
             _, predicted = torch.max(outputs, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
+
+            
     accuracy = 100 * correct / total
     print(f'Validation Accuracy: {accuracy:.2f}%')
-
-
+    path = f"models/baseline{base}.pth"
+    torch.save(model.state_dict(), path )
 
 Data=datasetinit()
 train_img_level_dataset =Data.train_img_level_dataset
 test_img_level_dataset =Data.test_img_level_dataset
 traindataloader = DataLoader(train_img_level_dataset, batch_size=32, shuffle=True)
 testdataloader = DataLoader(test_img_level_dataset, batch_size=32, shuffle=True)
-
-
-train_test_model(num_classes=8 , traindataloader=traindataloader,testdataloader=testdataloader)
+base = "1"
+train_test_model(num_classes=8 , traindataloader=traindataloader,testdataloader=testdataloader,base=base)
 
 
 

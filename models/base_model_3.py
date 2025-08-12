@@ -25,11 +25,6 @@ class GroupActivityClassifier(nn.Module):
         self.relu = nn.ReLU()
 
         self.fc2 = nn.Linear(512, num_classes)
-
-
-
-
-
     def forward(self, x):
         x = self.fc1(x)
         x = self.relu(x)
@@ -64,6 +59,8 @@ optimizer = torch.optim.Adam(classifier.parameters(), lr=1e-3)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 model = model.to(device)
+
+
 classifier = classifier.to(device)
 
 for i in range(0, len(train_player_dataset), 9): 

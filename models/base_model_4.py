@@ -10,25 +10,11 @@ import os
 
 from ..core import annotations
 
-class LSTM(nn.Module):
-    def __init__(self, input_len, hidden_size, num_classes, n_layers):
-        super(LSTM, self).__init__()
-        self.hidden_size = hidden_size 
-        self.n_layers = n_layers       
-        self.lstm = nn.LSTM(input_len, hidden_size, n_layers, batch_first=True)
-        self.output_layer = nn.Linear(hidden_size, num_classes)  
-
-    def forward(self, X):
-        hidden_states = torch.zeros(self.n_layers, X.size(0), self.hidden_size, device=X.device)
-        cell_states = torch.zeros(self.n_layers, X.size(0), self.hidden_size, device=X.device)
-
-        output, hide = self.lstm(X, (hidden_states, cell_states))
-        output = self.output_layer(output[:,-1,:])
-        return output
+from lstm_classifier import LSTM
 
 # Initialize AlexNet model
 model = torchvision.models.alexnet(pretrained=False) 
-model.load_state_dict(torch.load('baseline2.pth'))
+model.load_state_dict(torch.load('baseline1.pth'))
 model.eval()  
 
 # Set device
@@ -66,7 +52,7 @@ trainingmatches =matches[0:limit]
 
 for match in trainingmatches:
     clips = [f for f in os.listdir(os.path.join(path, match))]
-    clips = clips[:-1]
+    clips = clips[:-2]
     annotation_file = os.path.join(path , match , "annotations.txt")
     video_info, _, _ = annotations.read_file(annotation_file)
 
@@ -78,7 +64,6 @@ for match in trainingmatches:
 
         framestesnors = []
         frames = sorted(f for f in os.listdir(os.path.join(path, match, clip)) if f.endswith((".jpg", ".png")))
-        
         
         for frame in frames:
             fullpath = os.path.join(path, match, clip, frame)
@@ -103,13 +88,15 @@ for match in trainingmatches:
         id = int(clip)
         label = video_info[id]["groupactivity"]
         label = torch.tensor([label], dtype=torch.long, device=device)
-
-
-
         lossfunction = loss(out, label)
         opt.zero_grad()
         lossfunction.backward()
         opt.step()
+
+
+
+
+        
 
 #testing 
 lstm.eval()
@@ -121,7 +108,7 @@ with torch.no_grad():
         
     for match in testinggmatches:
         clips = [f for f in os.listdir(os.path.join(path, match))]
-        clips = clips[:-1]
+        clips = clips[:-2]
         annotation_file = os.path.join(path , match , "annotations.txt")
         video_info, _, _ = annotations.read_file(annotation_file)
 
@@ -170,7 +157,7 @@ print(f'Validation Accuracy: {accuracy:.2f}%')
 torch.save(lstm.state_dict(), "baseline4_classifier.pth")
 
 
-#classifier.load_state_dict(torch.load("baseline3_classifier.pth"))
+#classifier.load_state_dict(torch.load("baseline4_classifier.pth"))
 
 
 

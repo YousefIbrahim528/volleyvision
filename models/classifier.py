@@ -15,3 +15,16 @@ class LSTM(nn.Module):
         output, hide = self.lstm(X, (hidden_states, cell_states))
         output = self.output_layer(output[:,-1,:])
         return output
+class GroupActivityClassifier(nn.Module):
+    def __init__(self, input_dim=4096, num_classes=6):  
+        super(GroupActivityClassifier, self).__init__()
+        self.fc1 = nn.Linear(input_dim, 512)
+
+        self.relu = nn.ReLU()
+
+        self.fc2 = nn.Linear(512, num_classes)
+    def forward(self, x):
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.fc2(x)
+        return x

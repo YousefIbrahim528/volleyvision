@@ -10,7 +10,7 @@ import os
 
 from ..core import annotations
 
-from lstm_classifier import LSTM
+from models.classifier import LSTM
 
 # Initialize AlexNet model
 model = torchvision.models.alexnet(pretrained=False) 

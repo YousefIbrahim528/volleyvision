@@ -1,5 +1,5 @@
 
-from lstm_classifier import LSTM
+from models.classifier import LSTM
 from core.annotations import read_file,BoxInfo
 import os 
 from PIL import Image

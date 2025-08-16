@@ -15,21 +15,9 @@ from  base_model_1 import *
 
 
 from models.base_model_1 import train_test_model
+from models.classifier import GroupActivityClassifier
 
 
-class GroupActivityClassifier(nn.Module):
-    def __init__(self, input_dim=4096, num_classes=6):  
-        super(GroupActivityClassifier, self).__init__()
-        self.fc1 = nn.Linear(input_dim, 512)
-
-        self.relu = nn.ReLU()
-
-        self.fc2 = nn.Linear(512, num_classes)
-    def forward(self, x):
-        x = self.fc1(x)
-        x = self.relu(x)
-        x = self.fc2(x)
-        return x
 
 
 
@@ -49,19 +37,22 @@ test_player_dataset = Data.test_player_dataset
 train_img_level_dataset =Data.train_img_level_dataset
 test_img_level_dataset =Data.test_img_level_dataset
 
-
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 classifier = GroupActivityClassifier(input_dim=4096, num_classes=8)  # 8 group activities in volleyball dataset
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(classifier.parameters(), lr=1e-3)
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-model = model.to(device)
 
 
 classifier = classifier.to(device)
+
+
+
+
+model = model.to(device)
 
 for i in range(0, len(train_player_dataset), 9): 
     if i + 9 > len(train_player_dataset):

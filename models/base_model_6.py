@@ -136,4 +136,58 @@ torch.save({
 
 
 
-                
+
+# --------------------------
+# Evaluation 
+# --------------------------
+val_matches = matches[limit:]  # remaining 30% for validation
+lstm.eval()
+classifier.eval()
+
+correct, total = 0, 0
+
+with torch.no_grad():
+    for match in val_matches:
+        clips = [f for f in os.listdir(os.path.join(path, match))]
+        clips = clips[:-2]  
+        annotation_file = os.path.join(path, match, "annotations.txt")
+        video_info, _, _ = read_file(annotation_file)
+
+        for clip in clips:
+            full_path = os.path.join(path, match, clip)
+            frames = sorted(f for f in os.listdir(full_path) if f.endswith((".jpg", ".png")))
+
+            frame_indixes = (16,17,18,19,20,21,22,23,24)
+            middle_frames = [img for index, img in enumerate(frames) if index in frame_indixes]
+            clip_id = int(clip)
+            boxinfos = video_info[clip_id]["boxinfos"]
+
+            temporal_embeddings = []
+            for box_info in boxinfos:
+                player_cropped_imgs = []
+                for frame in middle_frames:
+                    image_path = os.path.join(path, match, clip, frame)
+                    image = Image.open(image_path).convert('RGB')
+                    player_crop = image.crop((box_info.x1, box_info.y1, box_info.x2, box_info.y2))
+                    img_tensor = transform(player_crop)
+                    player_cropped_imgs.append(img_tensor)
+
+                cropped_imgs = torch.stack(player_cropped_imgs, dim=0).to(device)
+                with torch.no_grad():
+                    player_feature_vectors = model(cropped_imgs)
+                player_feature_vectors = player_feature_vectors.unsqueeze(0).to(device)  # [1, 9, 4096]
+                temporal_embedding = lstm(player_feature_vectors)  # [500]
+                temporal_embeddings.append(temporal_embedding.unsqueeze(0))
+
+            temporal_embeddings = torch.cat(temporal_embeddings, dim=0)  # [num_players, 500]
+            final_hidden_state = torch.max(temporal_embeddings, dim=0)[0]  # [500]
+
+            label = torch.tensor([video_info[clip_id]["groupactivity"]], dtype=torch.long, device=device)
+            logits = classifier(final_hidden_state.unsqueeze(0))  # [1, 8]
+            pred = torch.argmax(logits, dim=1)
+
+            correct += (pred == label).sum().item()
+            total += 1
+
+accuracy = 100 * correct / total
+print(f"Validation Accuracy: {accuracy:.2f}%")
